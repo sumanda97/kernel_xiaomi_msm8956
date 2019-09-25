@@ -1,6 +1,6 @@
 VERSION = 3
 PATCHLEVEL = 10
-SUBLEVEL = 108
+SUBLEVEL = 109
 EXTRAVERSION =
 NAME = END-OF-LIFE
 
@@ -239,7 +239,9 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
 	  else echo sh; fi ; fi)
 
-CCACHE      := $(shell which ccache)
+# CCACHE
+CCACHE := $(shell which ccache)
+
 HOSTCC       = $(CCACHE) gcc
 HOSTCXX      = $(CCACHE) g++
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
@@ -341,6 +343,10 @@ DEPMOD		= /sbin/depmod
 PERL		= perl
 CHECK		= sparse
 
+# Use the wrapper for the compiler.  This wrapper scans for new
+# warnings and causes the build to stop upon encountering them.
+
+
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 CFLAGS_MODULE   =
@@ -376,7 +382,15 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -fno-delete-null-pointer-checks \
-		   -std=gnu89
+		   -Wno-deprecated-declarations \
+		   -Wno-misleading-indentation \
+		   -Wno-unused-const-variable \
+		   -Wno-shift-overflow \
+		   -Wno-bool-compare \
+		   -Wno-memset-transposed-args \
+		   -Wno-discarded-array-qualifiers -std=gnu89 \
+		   -Wno-tautological-compare -Wno-array-bounds \
+		   -Wno-nonnull
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
