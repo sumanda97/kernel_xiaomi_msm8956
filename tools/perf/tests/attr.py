@@ -92,7 +92,7 @@ class Event(dict):
     def equal(self, other):
         for t in Event.terms:
             log.debug("      [%s] %s %s" % (t, self[t], other[t]));
-            if not self.has_key(t) or not other.has_key(t):
+            if not (self.has_key(t) and other.has_key(t)):
                 return False
             if not self.compare_data(self[t], other[t]):
                 return False
@@ -141,10 +141,7 @@ class Test(object):
         self.load_events(path, self.expect)
 
     def is_event(self, name):
-        if name.find("event") == -1:
-            return False
-        else:
-            return True
+        return name.find("event") != -1
 
     def load_events(self, path, events):
         parser_event = ConfigParser.SafeConfigParser()
@@ -273,7 +270,7 @@ def setup_log(verbose):
 
     if verbose == 1:
         level = logging.WARNING
-    if verbose == 2:
+    elif verbose == 2:
         level = logging.INFO
     if verbose >= 3:
         level = logging.DEBUG

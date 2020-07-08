@@ -59,8 +59,10 @@ if not os.environ.get('CROSS_COMPILE'):
 
 def check_kernel():
     """Ensure that PWD is a kernel directory"""
-    if (not os.path.isfile('MAINTAINERS') or
-        not os.path.isfile('arch/arm/mach-msm/Kconfig')):
+    if not (
+        os.path.isfile('MAINTAINERS')
+        and os.path.isfile('arch/arm/mach-msm/Kconfig')
+    ):
         fail("This doesn't seem to be an MSM kernel dir")
 
 def check_build():
@@ -69,9 +71,7 @@ def check_build():
         try:
             os.makedirs(build_dir)
         except OSError as exc:
-            if exc.errno == errno.EEXIST:
-                pass
-            else:
+            if exc.errno != errno.EEXIST:
                 raise
 
 failed_targets = []
@@ -299,20 +299,20 @@ def scan_configs():
     """Get the full list of defconfigs appropriate for this tree."""
     names = []
     arch_pats = (
-        r'[fm]sm[0-9]*_defconfig',
-        r'apq*_defconfig',
-        r'qsd*_defconfig',
-        r'mdm*_defconfig',
-	r'mpq*_defconfig',
-        )
-    arch64_pats = (
-	r'msm*_defconfig',
-        )
+    r'[fm]sm[0-9]*_defconfig',
+    r'apq*_defconfig',
+    r'qsd*_defconfig',
+    r'mdm*_defconfig',
+    r'mpq*_defconfig',
+    )
     for p in arch_pats:
         for n in glob.glob('arch/arm/configs/' + p):
             name = os.path.basename(n)[:-10]
             names.append(Builder(name, n))
     if 'CROSS_COMPILE64' in os.environ:
+        arch64_pats = (
+        r'msm*_defconfig',
+        )
         for p in arch64_pats:
             for n in glob.glob('arch/arm64/configs/' + p):
                 name = os.path.basename(n)[:-10] + "-64"

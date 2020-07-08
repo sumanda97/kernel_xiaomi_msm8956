@@ -207,11 +207,7 @@ class TimeSlice:
 
 	def wake_up(self, ts_list, pid, cpu, fork):
 		old_rq = self.prev.rqs[cpu]
-		if fork:
-			new_rq = old_rq.wake_up_new(pid)
-		else:
-			new_rq = old_rq.wake_up(pid)
-
+		new_rq = old_rq.wake_up_new(pid) if fork else old_rq.wake_up(pid)
 		if new_rq is old_rq:
 			return
 		self.rqs[cpu] = new_rq
@@ -240,7 +236,7 @@ class TimeSliceList(UserList):
 		found = -1
 		searching = True
 		while searching:
-			if start == end or start == end - 1:
+			if start in [end, end - 1]:
 				searching = False
 
 			i = (end + start) / 2
@@ -280,11 +276,7 @@ class TimeSliceList(UserList):
 	def update_rectangle_cpu(self, slice, cpu):
 		rq = slice.rqs[cpu]
 
-		if slice.total_load != 0:
-			load_rate = rq.load() / float(slice.total_load)
-		else:
-			load_rate = 0
-
+		load_rate = rq.load() / float(slice.total_load) if slice.total_load != 0 else 0
 		red_power = int(0xff - (0xff * load_rate))
 		color = (0xff, red_power, red_power)
 
